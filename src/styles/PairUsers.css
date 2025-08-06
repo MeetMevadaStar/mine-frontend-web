@@ -1,0 +1,40 @@
+.pair-users {
+    display: flex;
+    justify-content: space-around;
+    padding: 2rem;
+}
+
+.user-column {
+    width: 45%;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+}
+
+.user-card {
+    padding: 0.8rem;
+    margin: 0.5rem 0;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.user-card.selected {
+    background-color: #1976d2;
+    color: white;
+}
+
+.pair-button {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #28a745;
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+}
