@@ -16,8 +16,12 @@ const request = async (method, url, options = {}) => {
     },
   };
 
+  console.log("requiresAuth", requiresAuth);
+
   if (requiresAuth) {
     const token = getToken();
+
+    console.log("token", token);
 
     if (!token) {
       localStorage.removeItem("authToken"); // Clear invalid/missing token

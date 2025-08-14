@@ -8,20 +8,18 @@ const Home = () => {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [selectedGender, setSelectedGender] = useState("all");
   const [sortOrder, setSortOrder] = useState("latest");
+  const [editUserData, setEditUserData] = useState(null);
 
   const applyFilters = useCallback((userList, gender, order) => {
     let filtered = [...userList];
-
     if (gender !== "all") {
       filtered = filtered.filter((user) => user.role_id === gender);
     }
-
     filtered.sort((a, b) => {
       const dateA = new Date(a.created_at);
       const dateB = new Date(b.created_at);
       return order === "latest" ? dateB - dateA : dateA - dateB;
     });
-
     setFilteredUsers(filtered);
   }, []);
 
@@ -39,20 +37,27 @@ const Home = () => {
   }, [applyFilters, selectedGender, sortOrder]);
 
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this user?"
-    );
-    if (!confirmDelete) return;
-
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
       await apiService.delete(`${ENDPOINTS.DELETE_USER}/${id}`, {
         requiresAuth: true,
       });
-      fetchUsers(); // refresh list
+      fetchUsers();
     } catch (err) {
       console.error("Failed to delete user", err);
       alert("Error deleting user.");
     }
+  };
+
+  const handleEdit = (user) => {
+    setEditUserData({
+      id: user.id,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+      mobile: user.mobile,
+      password: "",
+    });
   };
 
   const handleGenderChange = (e) => {
@@ -69,13 +74,13 @@ const Home = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [fetchUsers]); // ✅ No warning now
+  }, [fetchUsers]);
 
   return (
     <div className="home-container">
       <h2 className="home-title">All Users</h2>
 
-      {/* 🔽 Filters */}
+      {/* Filters */}
       <div className="filter-container">
         <div>
           <label>Gender: </label>
@@ -94,7 +99,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* 🧾 User Table */}
+      {/* User Table */}
       <div style={{ overflowX: "auto" }}>
         <table className="user-table">
           <thead>
@@ -105,7 +110,7 @@ const Home = () => {
               <th>Mobile</th>
               <th>Role</th>
               <th>Created At</th>
-              <th>Actions</th> {/* ✅ New column */}
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -129,10 +134,16 @@ const Home = () => {
                     {user.role_id || "-"}
                   </td>
                   <td>{formatDate(user.created_at)}</td>
-                  <td>
+                  <td className="action-buttons">
                     <button
-                      onClick={() => handleDelete(user.id)}
+                      className="edit-btn"
+                      onClick={() => handleEdit(user)}
+                    >
+                      Edit
+                    </button>
+                    <button
                       className="delete-btn"
+                      onClick={() => handleDelete(user.id)}
                     >
                       Delete
                     </button>
@@ -143,11 +154,115 @@ const Home = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Edit User Modal */}
+      {editUserData && (
+        <div
+          className="modal-overlay"
+          onClick={(e) => {
+            if (e.target.className === "modal-overlay") {
+              setEditUserData(null);
+            }
+          }}
+        >
+          <div className="modal">
+            <h3>Edit User</h3>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                try {
+                  await apiService.put(
+                    `${ENDPOINTS.EDIT_USER}/${editUserData.id}`,
+                    {
+                      requiresAuth: true,
+                      data: {
+                        first_name: editUserData.first_name,
+                        last_name: editUserData.last_name,
+                        email: editUserData.email,
+                        mobile: editUserData.mobile,
+                        password: editUserData.password || undefined,
+                      },
+                    }
+                  );
+                  alert("User updated successfully!");
+                  setEditUserData(null);
+                  fetchUsers();
+                } catch (err) {
+                  console.error("Failed to update user", err);
+                  alert("Error updating user.");
+                }
+              }}
+            >
+              <input
+                type="text"
+                value={editUserData.first_name}
+                onChange={(e) =>
+                  setEditUserData({
+                    ...editUserData,
+                    first_name: e.target.value,
+                  })
+                }
+                placeholder="First Name"
+                required
+              />
+              <input
+                type="text"
+                value={editUserData.last_name}
+                onChange={(e) =>
+                  setEditUserData({
+                    ...editUserData,
+                    last_name: e.target.value,
+                  })
+                }
+                placeholder="Last Name"
+                required
+              />
+              <input
+                type="email"
+                value={editUserData.email}
+                onChange={(e) =>
+                  setEditUserData({ ...editUserData, email: e.target.value })
+                }
+                placeholder="Email"
+                required
+              />
+              <input
+                type="text"
+                value={editUserData.mobile}
+                onChange={(e) =>
+                  setEditUserData({ ...editUserData, mobile: e.target.value })
+                }
+                placeholder="Mobile"
+                required
+              />
+              <input
+                type="password"
+                value={editUserData.password}
+                onChange={(e) =>
+                  setEditUserData({ ...editUserData, password: e.target.value })
+                }
+                placeholder="New Password (leave blank to keep current)"
+              />
+              <div className="modal-buttons">
+                <button type="submit" className="save-btn">
+                  Save
+                </button>
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setEditUserData(null)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-// 🕓 Format ISO date to readable format
 const formatDate = (isoDate) => {
   const date = new Date(isoDate);
   return date.toLocaleDateString("en-IN", {

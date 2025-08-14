@@ -65,15 +65,90 @@
     font-weight: 600;
 }
 
+/* Common button styles */
+.edit-btn,
 .delete-btn {
-    background-color: #ff4d4f;
     color: white;
     padding: 5px 10px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Edit button (green) */
+.edit-btn {
+    background-color: #4caf50;
+    margin-left: 5px;
+}
+
+.edit-btn:hover {
+    background-color: #3e8e41;
+}
+
+/* Delete button (red) */
+.delete-btn {
+    background-color: #ff4d4f;
+    margin-right: 5px;
 }
 
 .delete-btn:hover {
     background-color: #d9363e;
+}
+
+/* Optional: space between action buttons */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+/* ===== Modal Styles ===== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.modal {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 10px;
+    width: 400px;
+    max-width: 90%;
+}
+
+.modal input {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.save-btn {
+    background: #4CAF50;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+}
+
+.cancel-btn {
+    background: #ccc;
+    color: black;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
 }
