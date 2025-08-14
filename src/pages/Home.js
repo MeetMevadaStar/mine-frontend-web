@@ -45,7 +45,11 @@ const Home = () => {
       fetchUsers();
     } catch (err) {
       console.error("Failed to delete user", err);
-      alert("Error deleting user.");
+
+      const errorMsg =
+        err.response?.data?.msg || err.message || "Something went wrong";
+
+      alert(errorMsg);
     }
   };
 
@@ -155,7 +159,6 @@ const Home = () => {
         </table>
       </div>
 
-      {/* Edit User Modal */}
       {editUserData && (
         <div
           className="modal-overlay"
@@ -181,6 +184,7 @@ const Home = () => {
                         email: editUserData.email,
                         mobile: editUserData.mobile,
                         password: editUserData.password || undefined,
+                        role_id: editUserData.role_id, // 👈 send updated gender
                       },
                     }
                   );
@@ -235,6 +239,19 @@ const Home = () => {
                 placeholder="Mobile"
                 required
               />
+
+              {/* 👇 New Gender Dropdown */}
+              <select
+                value={editUserData.role_id || "male"}
+                onChange={(e) =>
+                  setEditUserData({ ...editUserData, role_id: e.target.value })
+                }
+                required
+              >
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+
               <input
                 type="password"
                 value={editUserData.password}
@@ -243,6 +260,7 @@ const Home = () => {
                 }
                 placeholder="New Password (leave blank to keep current)"
               />
+
               <div className="modal-buttons">
                 <button type="submit" className="save-btn">
                   Save
